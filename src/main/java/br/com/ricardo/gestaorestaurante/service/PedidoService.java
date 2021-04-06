@@ -37,8 +37,8 @@ public class PedidoService {
 	public boolean existePedido(Long pedidoId) {
 		return pedidosRepository.existsById(pedidoId);
 	}
-
-	public ContaMesa fecharConta(Integer mesaId) {
+	
+	public ContaMesa buscarConcluidosMesa(Integer mesaId) {
 		List<Pedido> pedidos = pedidosRepository.
 				findByNumeroMesaAndSituacao(mesaId, SituacaoPedido.CONCLUIDO);
 		ContaMesa contaMesa = new ContaMesa();
@@ -48,17 +48,26 @@ public class PedidoService {
 		}
 		contaMesa.setMensagem("Conta da mesa " + mesaId + " fechada com sucessso");
 		contaMesa.setValorConta( calcularContaMesa(pedidos));
+		contaMesa.setPedidos(pedidos);
 		return contaMesa;
+	}
+
+	public void fecharConta(Integer mesaId) {
+		List<Pedido> pedidos = pedidosRepository.
+				findByNumeroMesaAndSituacao(mesaId, SituacaoPedido.CONCLUIDO);
+		for (Pedido pedido : pedidos) {
+			pedido.setSituacao(SituacaoPedido.FECHADO);
+			pedidosRepository.save(pedido);
+		}
 	}
 
 	private BigDecimal calcularContaMesa(List<Pedido> pedidos) {
 		BigDecimal contaMesa = new BigDecimal(00.00);
 		for (Pedido pedido : pedidos) {
-			pedido.setSituacao(SituacaoPedido.FECHADO);
 			pedidosRepository.save(pedido);
 			contaMesa = contaMesa.add(pedido.getValor());
 		}
 		return contaMesa;
 	}
-
+	
 }

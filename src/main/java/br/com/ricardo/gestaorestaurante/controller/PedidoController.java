@@ -63,6 +63,17 @@ public class PedidoController {
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
+	
+	@GetMapping("/concluidos/{mesaId}")
+	public ResponseEntity<ContaMesa> buscarPedidosConcluidosMesa(@PathVariable Integer mesaId) {
+		return new ResponseEntity<>(pedidoService.buscarConcluidosMesa(mesaId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/mesa/{mesaId}")
+	public ResponseEntity<ContaMesa> fecharContaMesa(@PathVariable Integer mesaId) {
+		pedidoService.fecharConta(mesaId);
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
 
 	@PutMapping("/{pedidoId}")
 	public ResponseEntity<Pedido> atualizarPedido(@PathVariable Long pedidoId, @Valid @RequestBody Pedido pedido) {
@@ -72,11 +83,6 @@ public class PedidoController {
 		pedido.setId(pedidoId);
 		pedidoService.salvarPedido(pedido);
 		return new ResponseEntity<>(pedido, HttpStatus.OK);
-	}
-
-	@PutMapping("/mesa/{mesaId}")
-	public ResponseEntity<ContaMesa> fecharContaMesa(@PathVariable Integer mesaId) {
-		return new ResponseEntity<>(pedidoService.fecharConta(mesaId), HttpStatus.OK);
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
